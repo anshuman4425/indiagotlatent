@@ -19,11 +19,13 @@
     <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
 
-  <div class="moving-lamp" aria-hidden="true">
-    <div class="moving-lamp__beam"></div>
-    <div class="moving-lamp__fixture">
-      <div class="moving-lamp__arm"></div>
-      <div class="moving-lamp__head"><div class="moving-lamp__lens"></div></div>
+  <div class="lamp-rig" aria-hidden="true">
+    <div class="lamp-swing">
+      <div class="lamp-arm-bar"></div>
+      <div class="lamp-head">
+        <div class="lamp-lens"></div>
+        <div class="lamp-beam"></div>
+      </div>
     </div>
   </div>
 
@@ -45,7 +47,8 @@
         <span class="logo__line2"><span class="logo__icon">📡</span>LATENT</span>
       </div>
       <p class="tagline">WEBSITES NOBODY ASKED FOR. SCORES NOBODY EXPECTED.</p>
-      <button class="btn-stage" id="buildLineupBtn">📝 BUILD LINEUP</button>
+      <button class="btn-stage" id="introActionBtn">📝 BUILD LINEUP</button>
+      <button class="btn-stage btn-stage--secondary btn-stage--intro-edit" id="introEditLineupBtn" hidden>✏️ Edit Lineup</button>
     </section>
 
     <section class="scene" data-scene="queue">
@@ -65,8 +68,8 @@
         <div class="queue-list" id="queueList"></div>
         <p class="queue-empty" id="queueEmpty">No sites in the lineup yet — add a few above, then start the show.</p>
 
-        <button class="btn-stage" id="startShowBtn">🎤 START SHOW</button>
-        <p class="control-card__hint">Add as many sites as you want now, off camera. You'll enter each site's scores live, one at a time, once the show starts — you can also come back here mid-show to queue up more.</p>
+        <button class="btn-stage" id="queueDoneBtn">✅ DONE — BACK TO START SCREEN</button>
+        <p class="control-card__hint">Add as many sites as you want now, off camera. Once you're done, you'll land back on the start screen — that's your cue to hit record and click "Start Show".</p>
       </div>
     </section>
 

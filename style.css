@@ -78,60 +78,88 @@ html, body {
   100% { transform: translateY(-95vh) scale(1.1); opacity: 0; }
 }
 
-/* ---------- Moving stage lamp ---------- */
-.moving-lamp {
+/* ---------- Swinging stage lamp ---------- */
+/* A fixed ceiling mount at top-center; the arm+head hang from it and
+   swing like a pendulum that was physically bumped, rotating around
+   the mount rather than sliding sideways. */
+.lamp-rig {
   position: absolute;
   top: 0;
-  left: 10%;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 6;
-  animation: lampSweep 9s ease-in-out infinite alternate;
   pointer-events: none;
 }
-@keyframes lampSweep {
-  0% { left: 10%; }
-  100% { left: 82%; }
+.lamp-rig::before {
+  content: '';
+  display: block;
+  width: 46px;
+  height: 22px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #6a6a6a, #201f1f);
+  border-radius: 5px 5px 3px 3px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.6);
 }
-.moving-lamp__fixture {
-  position: relative;
-  width: 44px;
+.lamp-swing {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transform-origin: 50% 0%;
+  animation: lampSwing 6.5s ease-in-out infinite alternate;
 }
-.moving-lamp__arm {
-  width: 6px;
-  height: 26px;
-  background: linear-gradient(180deg, #3a3a3a, #161616);
-  border-radius: 3px;
+@keyframes lampSwing {
+  0% { transform: rotate(-26deg); }
+  100% { transform: rotate(26deg); }
 }
-.moving-lamp__head {
-  width: 40px;
-  height: 26px;
-  border-radius: 8px;
-  background: linear-gradient(180deg, #4a4a4a, #171717);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+.lamp-arm-bar {
+  width: 14px;
+  height: 190px;
+  background: linear-gradient(90deg, #202020, #565656 45%, #202020);
+  border-radius: 7px;
+  box-shadow: inset -3px 0 5px rgba(0,0,0,0.5);
+}
+.lamp-head {
+  position: relative;
+  width: 92px;
+  height: 72px;
+  margin-top: -6px;
+  border-radius: 16px;
+  background: linear-gradient(150deg, #6e6e6e, #262626 55%, #141414);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.65), inset 0 3px 6px rgba(255,255,255,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.moving-lamp__lens {
-  width: 16px;
+.lamp-head::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
   height: 16px;
+  border: 5px solid #3a3a3a;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+}
+.lamp-lens {
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff8dd 0%, var(--gold) 60%, #b8860b 100%);
-  box-shadow: 0 0 16px 4px rgba(255,214,10,0.85), 0 0 40px 10px rgba(255,214,10,0.35);
+  background: radial-gradient(circle, #fff8dd 0%, var(--gold) 55%, #b8860b 100%);
+  box-shadow: 0 0 26px 8px rgba(255,214,10,0.85), 0 0 65px 18px rgba(255,214,10,0.35);
   animation: lensFlicker 2.4s ease-in-out infinite;
 }
 @keyframes lensFlicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.82; } }
-.moving-lamp__beam {
+.lamp-beam {
   position: absolute;
-  top: 52px;
+  top: 100%;
   left: 50%;
-  width: 140px;
-  height: 88vh;
+  width: 220px;
+  height: 85vh;
   transform: translateX(-50%);
   clip-path: polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%);
-  background: linear-gradient(180deg, rgba(255,232,150,0.32) 0%, rgba(255,214,10,0.08) 55%, transparent 85%);
+  background: linear-gradient(180deg, rgba(255,232,150,0.34) 0%, rgba(255,214,10,0.09) 55%, transparent 85%);
   mix-blend-mode: screen;
 }
 
@@ -348,6 +376,12 @@ html, body {
   font-size: 0.9rem;
   width: 100%;
   margin-bottom: 18px;
+}
+.btn-stage--intro-edit {
+  width: auto;
+  margin: 18px 0 0;
+  padding: 10px 24px;
+  font-size: 0.82rem;
 }
 
 /* ---------- Kicker ---------- */
@@ -605,13 +639,33 @@ html, body {
   margin: 0 0 24px;
 }
 .control-scores--live {
-  width: min(520px, 82vw);
-  margin: 0 0 30px;
+  width: min(460px, 80vw);
+  gap: 18px 20px;
+  margin: 0 0 34px;
+}
+.control-scores--live .control-score label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--gold-pale);
+  text-shadow: 0 0 6px rgba(255,214,10,0.25);
 }
 .control-scores--live .control-score input {
-  font-size: 1.3rem;
-  padding: 12px 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 2.1rem;
+  padding: 8px 10px;
   text-align: center;
+  background: #201319;
+  border: 2px solid rgba(255,214,10,0.4);
+  border-radius: 12px;
+  color: var(--gold);
+  text-shadow: 0 0 12px rgba(255,214,10,0.3);
+}
+.control-scores--live .control-score input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(255,214,10,0.18);
 }
 
 /* ---------- Wrap scene ---------- */

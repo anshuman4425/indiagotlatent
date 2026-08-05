@@ -55,20 +55,40 @@
     }
   }
 
-  homeBtn.addEventListener('click', () => goToScene('intro'));
+  homeBtn.addEventListener('click', () => { refreshIntroButton(); goToScene('intro'); });
 
-  // ---------- Intro -> Queue ----------
-  document.getElementById('buildLineupBtn').addEventListener('click', () => {
-    renderQueueList();
-    goToScene('queue');
-  });
+  // ---------- Intro (dynamic action button) ----------
+  const introActionBtn = document.getElementById('introActionBtn');
+  const introEditLineupBtn = document.getElementById('introEditLineupBtn');
+
+  function refreshIntroButton() {
+    const hasPending = state.queue.length > 0 && state.currentIndex < state.queue.length;
+
+    if (state.queue.length === 0) {
+      introActionBtn.textContent = '📝 BUILD LINEUP';
+      introActionBtn.onclick = () => { renderQueueList(); goToScene('queue'); };
+      introEditLineupBtn.hidden = true;
+    } else if (hasPending) {
+      introActionBtn.textContent = state.currentIndex === 0 ? '🎤 START SHOW' : '▶ RESUME SHOW';
+      introActionBtn.onclick = () => {
+        loadPerformer(state.currentIndex);
+        goToScene('performer');
+      };
+      introEditLineupBtn.hidden = false;
+    } else {
+      introActionBtn.textContent = '📝 ADD MORE SITES';
+      introActionBtn.onclick = () => { renderQueueList(); goToScene('queue'); };
+      introEditLineupBtn.hidden = true;
+    }
+  }
+  introEditLineupBtn.addEventListener('click', () => { renderQueueList(); goToScene('queue'); });
 
   // ---------- Queue management ----------
   const queueNameInput = document.getElementById('queueName');
   const queueTaglineInput = document.getElementById('queueTagline');
   const queueListEl = document.getElementById('queueList');
   const queueEmptyEl = document.getElementById('queueEmpty');
-  const startShowBtn = document.getElementById('startShowBtn');
+  const queueDoneBtn = document.getElementById('queueDoneBtn');
 
   function renderQueueList() {
     queueListEl.innerHTML = '';
@@ -92,13 +112,6 @@
       row.querySelector('.queue-item__remove').addEventListener('click', () => removeQueueItem(item.id));
       queueListEl.appendChild(row);
     });
-
-    startShowBtn.textContent = state.currentIndex > 0 && state.currentIndex < state.queue.length
-      ? '▶ RESUME SHOW'
-      : '🎤 START SHOW';
-    startShowBtn.disabled = state.queue.length === 0 || state.currentIndex >= state.queue.length;
-    startShowBtn.style.opacity = startShowBtn.disabled ? '0.4' : '1';
-    startShowBtn.style.cursor = startShowBtn.disabled ? 'not-allowed' : 'pointer';
 
     updateEpisodeTag();
   }
@@ -127,10 +140,9 @@
     renderQueueList();
   }
 
-  startShowBtn.addEventListener('click', () => {
-    if (state.currentIndex >= state.queue.length) return;
-    loadPerformer(state.currentIndex);
-    goToScene('performer');
+  queueDoneBtn.addEventListener('click', () => {
+    refreshIntroButton();
+    goToScene('intro');
   });
 
   // ---------- Performer reveal ----------
@@ -285,14 +297,20 @@
     }
   });
 
-  document.getElementById('endShowBtn').addEventListener('click', () => goToScene('intro'));
+  document.getElementById('endShowBtn').addEventListener('click', () => {
+    refreshIntroButton();
+    goToScene('intro');
+  });
 
   // ---------- Wrap actions ----------
   document.getElementById('addMoreBtn').addEventListener('click', () => {
     renderQueueList();
     goToScene('queue');
   });
-  document.getElementById('wrapHomeBtn').addEventListener('click', () => goToScene('intro'));
+  document.getElementById('wrapHomeBtn').addEventListener('click', () => {
+    refreshIntroButton();
+    goToScene('intro');
+  });
 
   // ---------- Keyboard shortcuts ----------
   document.addEventListener('keydown', (e) => {
@@ -300,6 +318,7 @@
     const isTyping = tag === 'INPUT' || tag === 'TEXTAREA';
 
     if (e.key === 'Escape') {
+      refreshIntroButton();
       goToScene('intro');
       return;
     }
@@ -317,4 +336,5 @@
 
   // ---------- Init ----------
   updateEpisodeTag();
+  refreshIntroButton();
 })();
