@@ -3,174 +3,110 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Internet Got Latent — Website Roast Scorer</title>
-<meta name="description" content="Score and roast the internet's weirdest websites. A judging panel for tech channel reviews, styled after India's Got Latent." />
+<title>Internet Got Latent — Live Stage</title>
+<meta name="description" content="An animated on-screen stage for recording 'Internet Got Latent' — reveal a website, score it, and let the judges decide." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎤</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Playfair+Display:wght@700;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<div class="ticker">
-  <div class="ticker__track">
-    <span>🎤 EPISODE 001 &nbsp;•&nbsp; ROASTING THE INTERNET, ONE SITE AT A TIME &nbsp;•&nbsp; NO MERCY, ONLY LATENT ENERGY &nbsp;•&nbsp; JUDGES ARE WATCHING 👀 &nbsp;•&nbsp; EPISODE 001 &nbsp;•&nbsp; ROASTING THE INTERNET, ONE SITE AT A TIME &nbsp;•&nbsp; NO MERCY, ONLY LATENT ENERGY &nbsp;•&nbsp; JUDGES ARE WATCHING 👀 &nbsp;•&nbsp;</span>
+<div class="stage">
+  <div class="spotlight"></div>
+  <div class="sparks" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
+  <div class="curtain curtain--left"></div>
+  <div class="curtain curtain--right"></div>
+  <div class="valance"></div>
+  <div class="stage-floor"></div>
+  <div class="flash-overlay" id="flashOverlay"></div>
+
+  <div class="brand-watermark" id="watermark">🎤 INTERNET GOT LATENT</div>
+  <div class="episode-tag" id="episodeTag" hidden>SITE #001</div>
+  <button class="home-btn" id="homeBtn" title="Back to intro">🏠</button>
+
+  <main id="sceneRoot">
+
+    <section class="scene active" data-scene="intro">
+      <div class="logo">
+        <span class="logo__line1">INTERNET GOT</span>
+        <span class="logo__line2"><span class="logo__icon">📡</span>LATENT</span>
+      </div>
+      <p class="tagline">WEBSITES NOBODY ASKED FOR. SCORES NOBODY EXPECTED.</p>
+      <button class="btn-stage" data-goto="setup">🎤 START SHOW</button>
+    </section>
+
+    <section class="scene" data-scene="setup">
+      <div class="control-card">
+        <p class="control-card__label">BACKSTAGE — SET UP NEXT CONTESTANT</p>
+
+        <div class="control-field">
+          <label for="inputName">Website Name</label>
+          <input type="text" id="inputName" placeholder="e.g. RadioGarden.com" maxlength="60" />
+        </div>
+        <div class="control-field">
+          <label for="inputTagline">One-line Description</label>
+          <input type="text" id="inputTagline" placeholder="e.g. The world becomes your radio" maxlength="90" />
+        </div>
+
+        <div class="control-scores">
+          <div class="control-score">
+            <label for="inputDesign">🎨 Design</label>
+            <input type="number" id="inputDesign" min="0" max="10" step="0.1" value="8" />
+          </div>
+          <div class="control-score">
+            <label for="inputUsefulness">🚀 Usefulness</label>
+            <input type="number" id="inputUsefulness" min="0" max="10" step="0.1" value="8" />
+          </div>
+          <div class="control-score">
+            <label for="inputWow">🤯 Wow Factor</label>
+            <input type="number" id="inputWow" min="0" max="10" step="0.1" value="8" />
+          </div>
+          <div class="control-score">
+            <label for="inputFreeValue">💸 Free Value</label>
+            <input type="number" id="inputFreeValue" min="0" max="10" step="0.1" value="8" />
+          </div>
+          <div class="control-score">
+            <label for="inputReturn">🎯 Return Value</label>
+            <input type="number" id="inputReturn" min="0" max="10" step="0.1" value="8" />
+          </div>
+        </div>
+
+        <button class="btn-stage" id="revealPerformerBtn">🎬 REVEAL PERFORMER</button>
+        <p class="control-card__hint">Tip: this backstage screen is just for you — cut it out in editing, or keep the window small while you fill it in before going full screen.</p>
+      </div>
+    </section>
+
+    <section class="scene" data-scene="performer">
+      <p class="kicker">NEXT PERFORMER</p>
+      <h2 class="performer-name" id="performerName">Website Name</h2>
+      <p class="performer-tagline" id="performerTagline">Tagline goes here</p>
+      <button class="btn-stage" id="scoreItBtn">🎭 SCORE IT</button>
+    </section>
+
+    <section class="scene" data-scene="scorecard">
+      <p class="kicker">INTERNET SCORECARD</p>
+      <h2 class="scorecard-name" id="scorecardName">Website Name</h2>
+      <div class="scorecard-rows" id="scorecardRows"></div>
+      <div class="scorecard-divider"></div>
+      <button class="btn-stage" id="finalVerdictBtn" hidden>🏆 FINAL VERDICT</button>
+    </section>
+
+    <section class="scene" data-scene="verdict">
+      <p class="kicker">THE JUDGES HAVE DECIDED&hellip;</p>
+      <div class="final-score" id="finalScore">0.0</div>
+      <p class="verdict-label" id="verdictLabel" hidden></p>
+      <div class="verdict-actions" id="verdictActions" hidden>
+        <button class="btn-stage" id="nextWebsiteBtn">➡️ NEXT WEBSITE</button>
+        <button class="btn-stage btn-stage--ghost" id="endShowBtn">🏠 END SHOW</button>
+      </div>
+    </section>
+
+  </main>
 </div>
-
-<header class="hero">
-  <div class="hero__glow"></div>
-  <p class="hero__kicker">A TECH CHANNEL SPIN-OFF</p>
-  <h1 class="hero__title">INTERNET <span>GOT</span> LATENT</h1>
-  <p class="hero__subtitle">Where the internet's most unhinged websites face the panel.</p>
-  <div class="hero__stats" id="heroStats">
-    <div class="stat"><span class="stat__num" id="statCount">0</span><span class="stat__label">Sites Judged</span></div>
-    <div class="stat"><span class="stat__num" id="statAvg">0.0</span><span class="stat__label">Avg Score</span></div>
-    <div class="stat"><span class="stat__num" id="statGoat">0</span><span class="stat__label">GOAT Verdicts</span></div>
-  </div>
-</header>
-
-<main class="container">
-
-  <section class="panel form-panel" id="entryForm">
-    <div class="panel__header">
-      <h2><span class="panel__tag">NEW CONTESTANT</span> Submit a Site to the Panel</h2>
-      <p class="panel__hint">Fill the card, drag the sliders, let the judges decide.</p>
-    </div>
-
-    <form id="siteForm" novalidate>
-      <input type="hidden" id="editingId" value="" />
-
-      <div class="grid-2">
-        <div class="field">
-          <label for="siteName">Site Name *</label>
-          <input type="text" id="siteName" placeholder="e.g. ClickTheButton.exe" required maxlength="80" />
-        </div>
-        <div class="field">
-          <label for="siteUrl">Site URL *</label>
-          <input type="url" id="siteUrl" placeholder="https://..." required />
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="field">
-          <label for="siteCategory">Category</label>
-          <select id="siteCategory">
-            <option>Portfolio / Personal</option>
-            <option>AI Slop</option>
-            <option>Tool / Utility</option>
-            <option>Meme / Joke Site</option>
-            <option>E-commerce</option>
-            <option>Game / Interactive</option>
-            <option>Art / Experimental</option>
-            <option>Startup Landing Page</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="thumbUrl">Thumbnail URL (optional)</label>
-          <input type="url" id="thumbUrl" placeholder="https://... screenshot link" />
-        </div>
-      </div>
-
-      <div class="scores-grid">
-        <div class="score-field">
-          <label for="scoreDesign">🎨 Design &amp; Vibes <span class="score-live" id="liveDesign">5</span></label>
-          <input type="range" id="scoreDesign" min="0" max="10" step="0.5" value="5" />
-        </div>
-        <div class="score-field">
-          <label for="scoreUx">🧭 Usability / UX <span class="score-live" id="liveUx">5</span></label>
-          <input type="range" id="scoreUx" min="0" max="10" step="0.5" value="5" />
-        </div>
-        <div class="score-field">
-          <label for="scoreContent">📄 Content Quality <span class="score-live" id="liveContent">5</span></label>
-          <input type="range" id="scoreContent" min="0" max="10" step="0.5" value="5" />
-        </div>
-        <div class="score-field">
-          <label for="scoreLatent">🫠 Latent Factor <span class="score-live" id="liveLatent">5</span></label>
-          <input type="range" id="scoreLatent" min="0" max="10" step="0.5" value="5" />
-        </div>
-        <div class="score-field">
-          <label for="scoreChaos">🎭 Entertainment / Chaos <span class="score-live" id="liveChaos">5</span></label>
-          <input type="range" id="scoreChaos" min="0" max="10" step="0.5" value="5" />
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="judgeNotes">Judge's Verdict / Roast Notes</label>
-        <textarea id="judgeNotes" rows="3" placeholder="What did the panel have to say about this one?"></textarea>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn--primary" id="submitBtn">SEND TO THE PANEL 🎤</button>
-        <button type="button" class="btn btn--ghost" id="cancelEditBtn" hidden>Cancel Edit</button>
-      </div>
-    </form>
-  </section>
-
-  <section class="panel">
-    <div class="panel__header panel__header--row">
-      <div>
-        <h2><span class="panel__tag">THE LEADERBOARD</span> Hall of Latent</h2>
-        <p class="panel__hint">Every site that's faced the panel, ranked and roasted.</p>
-      </div>
-      <div class="toolbar">
-        <input type="search" id="searchInput" placeholder="Search contestants..." />
-        <select id="sortSelect">
-          <option value="score-desc">Score: High → Low</option>
-          <option value="score-asc">Score: Low → High</option>
-          <option value="date-desc">Newest First</option>
-          <option value="date-asc">Oldest First</option>
-          <option value="name-asc">Name: A → Z</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="io-bar">
-      <button class="btn btn--small" id="exportBtn">⬇ Export JSON</button>
-      <label class="btn btn--small btn--file">
-        ⬆ Import JSON
-        <input type="file" id="importInput" accept="application/json" hidden />
-      </label>
-      <button class="btn btn--small btn--danger" id="clearAllBtn">🗑 Clear All</button>
-    </div>
-
-    <div id="entriesList" class="entries-list"></div>
-    <p id="emptyState" class="empty-state">No contestants yet. The stage is empty — send in the first site above. 🎬</p>
-  </section>
-
-</main>
-
-<footer class="footer">
-  <p>INTERNET GOT LATENT — a scoring stage for tech channel reviews. Data is stored locally in your browser.</p>
-</footer>
-
-<template id="entryCardTemplate">
-  <article class="card">
-    <div class="card__thumb-wrap">
-      <div class="card__thumb" data-thumb></div>
-      <span class="card__number" data-number></span>
-      <span class="card__verdict" data-verdict></span>
-    </div>
-    <div class="card__body">
-      <div class="card__title-row">
-        <h3 class="card__title"><a data-link target="_blank" rel="noopener noreferrer" data-name></a></h3>
-        <span class="card__category" data-category></span>
-      </div>
-      <div class="card__score-overall">
-        <span class="card__score-num" data-overall></span>
-        <span class="card__score-den">/10</span>
-      </div>
-      <div class="card__bars" data-bars></div>
-      <p class="card__notes" data-notes></p>
-      <div class="card__actions">
-        <button class="btn btn--small" data-edit>Edit</button>
-        <button class="btn btn--small btn--danger" data-delete>Delete</button>
-      </div>
-    </div>
-  </article>
-</template>
 
 <script src="script.js"></script>
 </body>
