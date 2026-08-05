@@ -58,30 +58,31 @@
   homeBtn.addEventListener('click', () => { refreshIntroButton(); goToScene('intro'); });
 
   // ---------- Intro (dynamic action button) ----------
+  // This screen is what ends up on camera, so it never mentions the
+  // lineup/queue mechanism — it only ever offers to start/resume the
+  // show. Building the lineup happens off camera via the "L" shortcut
+  // (or automatically on first load, before anything's been recorded).
   const introActionBtn = document.getElementById('introActionBtn');
-  const introEditLineupBtn = document.getElementById('introEditLineupBtn');
 
   function refreshIntroButton() {
-    const hasPending = state.queue.length > 0 && state.currentIndex < state.queue.length;
-
     if (state.queue.length === 0) {
-      introActionBtn.textContent = '📝 BUILD LINEUP';
-      introActionBtn.onclick = () => { renderQueueList(); goToScene('queue'); };
-      introEditLineupBtn.hidden = true;
-    } else if (hasPending) {
+      renderQueueList();
+      goToScene('queue');
+      return;
+    }
+
+    const hasPending = state.currentIndex < state.queue.length;
+    if (hasPending) {
       introActionBtn.textContent = state.currentIndex === 0 ? '🎤 START SHOW' : '▶ RESUME SHOW';
       introActionBtn.onclick = () => {
         loadPerformer(state.currentIndex);
         goToScene('performer');
       };
-      introEditLineupBtn.hidden = false;
     } else {
-      introActionBtn.textContent = '📝 ADD MORE SITES';
-      introActionBtn.onclick = () => { renderQueueList(); goToScene('queue'); };
-      introEditLineupBtn.hidden = true;
+      introActionBtn.textContent = '🎬 SHOW COMPLETE';
+      introActionBtn.onclick = () => goToScene('wrap');
     }
   }
-  introEditLineupBtn.addEventListener('click', () => { renderQueueList(); goToScene('queue'); });
 
   // ---------- Queue management ----------
   const queueNameInput = document.getElementById('queueName');
@@ -146,13 +147,25 @@
   });
 
   // ---------- Performer reveal ----------
+  function replayAnimation(el, animationValue) {
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = animationValue;
+  }
+
   function loadPerformer(index) {
     const item = state.queue[index];
     if (!item) return;
-    document.getElementById('performerName').textContent = item.name;
+
+    const nameEl = document.getElementById('performerName');
+    nameEl.textContent = item.name;
+    replayAnimation(nameEl, 'riseIn 0.6s ease both');
+
     const taglineEl = document.getElementById('performerTagline');
     taglineEl.textContent = item.tagline || '';
     taglineEl.style.display = item.tagline ? '' : 'none';
+    replayAnimation(taglineEl, 'riseIn 0.6s 0.15s ease both');
+
     document.getElementById('scoreEntryName').textContent = item.name;
     updateEpisodeTag();
   }
@@ -320,6 +333,12 @@
     if (e.key === 'Escape') {
       refreshIntroButton();
       goToScene('intro');
+      return;
+    }
+
+    if (!isTyping && e.key.toLowerCase() === 'l') {
+      renderQueueList();
+      goToScene('queue');
       return;
     }
 
