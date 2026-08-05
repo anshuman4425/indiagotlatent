@@ -38,12 +38,14 @@
   <main id="sceneRoot">
 
     <section class="scene active" data-scene="intro">
-      <div class="logo">
-        <span class="logo__line1">INTERNET GOT</span>
-        <span class="logo__line2"><span class="logo__icon">📡</span>LATENT</span>
+      <div class="stage-card stage-card--intro">
+        <div class="logo">
+          <span class="logo__line1">INTERNET GOT</span>
+          <span class="logo__line2"><span class="logo__icon">📡</span>LATENT</span>
+        </div>
+        <p class="tagline">Welcome to the weird side of the internet, where every website gets one chance to impress.</p>
+        <button class="btn-stage" id="introActionBtn">🎤 START SHOW</button>
       </div>
-      <p class="tagline">Welcome to the weird side of the internet, where every website gets one chance to impress.</p>
-      <button class="btn-stage" id="introActionBtn">🎤 START SHOW</button>
     </section>
 
     <section class="scene" data-scene="queue">
@@ -69,10 +71,12 @@
     </section>
 
     <section class="scene" data-scene="performer">
-      <p class="kicker">NEXT PERFORMER</p>
-      <h2 class="performer-name" id="performerName">Website Name</h2>
-      <p class="performer-tagline" id="performerTagline">Tagline goes here</p>
-      <button class="btn-stage" id="scoreItBtn">🎭 SCORE IT</button>
+      <div class="stage-card">
+        <p class="kicker">NEXT PERFORMER</p>
+        <h2 class="performer-name" id="performerName">Website Name</h2>
+        <p class="performer-tagline" id="performerTagline">Tagline goes here</p>
+        <button class="btn-stage" id="scoreItBtn">🎭 SCORE IT</button>
+      </div>
     </section>
 
     <section class="scene" data-scene="scoreEntry">
@@ -100,29 +104,35 @@
     </section>
 
     <section class="scene" data-scene="scorecard">
-      <p class="kicker">INTERNET SCORECARD</p>
-      <h2 class="scorecard-name" id="scorecardName">Website Name</h2>
-      <div class="scorecard-rows" id="scorecardRows"></div>
-      <div class="scorecard-divider"></div>
-      <button class="btn-stage" id="finalVerdictBtn" hidden>🏆 FINAL VERDICT</button>
+      <div class="stage-card">
+        <p class="kicker">INTERNET SCORECARD</p>
+        <h2 class="scorecard-name" id="scorecardName">Website Name</h2>
+        <div class="scorecard-rows" id="scorecardRows"></div>
+        <div class="scorecard-divider"></div>
+        <button class="btn-stage" id="finalVerdictBtn" hidden>🏆 FINAL VERDICT</button>
+      </div>
     </section>
 
     <section class="scene" data-scene="verdict">
-      <p class="kicker">THE JUDGES HAVE DECIDED&hellip;</p>
-      <div class="final-score" id="finalScore">0.0</div>
-      <p class="verdict-label" id="verdictLabel" hidden></p>
-      <div class="verdict-actions" id="verdictActions" hidden>
-        <button class="btn-stage" id="nextWebsiteBtn">➡️ NEXT WEBSITE</button>
-        <button class="btn-stage btn-stage--ghost" id="endShowBtn">🏠 END SHOW</button>
+      <div class="stage-card">
+        <p class="kicker">THE JUDGES HAVE DECIDED&hellip;</p>
+        <div class="final-score" id="finalScore">0.0</div>
+        <p class="verdict-label" id="verdictLabel" hidden></p>
+        <div class="verdict-actions" id="verdictActions" hidden>
+          <button class="btn-stage" id="nextWebsiteBtn">➡️ NEXT WEBSITE</button>
+          <button class="btn-stage btn-stage--ghost" id="endShowBtn">🏠 END SHOW</button>
+        </div>
       </div>
     </section>
 
     <section class="scene" data-scene="wrap">
-      <p class="kicker">THAT'S A WRAP</p>
-      <h2 class="wrap-title">🎬 Every site in the lineup has been judged.</h2>
-      <div class="verdict-actions">
-        <button class="btn-stage" id="addMoreBtn">➕ ADD MORE SITES</button>
-        <button class="btn-stage btn-stage--ghost" id="wrapHomeBtn">🏠 END SHOW</button>
+      <div class="stage-card">
+        <p class="kicker">THAT'S A WRAP</p>
+        <h2 class="wrap-title">🎬 Every site in the lineup has been judged.</h2>
+        <div class="verdict-actions">
+          <button class="btn-stage" id="addMoreBtn">➕ ADD MORE SITES</button>
+          <button class="btn-stage btn-stage--ghost" id="wrapHomeBtn">🏠 END SHOW</button>
+        </div>
       </div>
     </section>
 
