@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Internet Got Latent — Live Stage</title>
-<meta name="description" content="An animated on-screen stage for recording 'Internet Got Latent' — reveal a website, score it, and let the judges decide." />
+<meta name="description" content="An animated on-screen stage for recording 'Internet Got Latent' — build a lineup, then score each website live on camera." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎤</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +18,15 @@
   <div class="sparks" aria-hidden="true">
     <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
+
+  <div class="moving-lamp" aria-hidden="true">
+    <div class="moving-lamp__beam"></div>
+    <div class="moving-lamp__fixture">
+      <div class="moving-lamp__arm"></div>
+      <div class="moving-lamp__head"><div class="moving-lamp__lens"></div></div>
+    </div>
+  </div>
+
   <div class="curtain curtain--left"></div>
   <div class="curtain curtain--right"></div>
   <div class="valance"></div>
@@ -25,7 +34,7 @@
   <div class="flash-overlay" id="flashOverlay"></div>
 
   <div class="brand-watermark" id="watermark">🎤 INTERNET GOT LATENT</div>
-  <div class="episode-tag" id="episodeTag" hidden>SITE #001</div>
+  <div class="episode-tag" id="episodeTag" hidden></div>
   <button class="home-btn" id="homeBtn" title="Back to intro">🏠</button>
 
   <main id="sceneRoot">
@@ -36,47 +45,28 @@
         <span class="logo__line2"><span class="logo__icon">📡</span>LATENT</span>
       </div>
       <p class="tagline">WEBSITES NOBODY ASKED FOR. SCORES NOBODY EXPECTED.</p>
-      <button class="btn-stage" data-goto="setup">🎤 START SHOW</button>
+      <button class="btn-stage" id="buildLineupBtn">📝 BUILD LINEUP</button>
     </section>
 
-    <section class="scene" data-scene="setup">
+    <section class="scene" data-scene="queue">
       <div class="control-card">
-        <p class="control-card__label">BACKSTAGE — SET UP NEXT CONTESTANT</p>
+        <p class="control-card__label">BEFORE THE SHOW — BUILD YOUR LINEUP</p>
 
         <div class="control-field">
-          <label for="inputName">Website Name</label>
-          <input type="text" id="inputName" placeholder="e.g. RadioGarden.com" maxlength="60" />
+          <label for="queueName">Website Name</label>
+          <input type="text" id="queueName" placeholder="e.g. RadioGarden.com" maxlength="60" />
         </div>
         <div class="control-field">
-          <label for="inputTagline">One-line Description</label>
-          <input type="text" id="inputTagline" placeholder="e.g. The world becomes your radio" maxlength="90" />
+          <label for="queueTagline">One-line Description (optional)</label>
+          <input type="text" id="queueTagline" placeholder="e.g. The world becomes your radio" maxlength="90" />
         </div>
+        <button class="btn-stage btn-stage--secondary" id="addToQueueBtn" type="button">➕ ADD TO LINEUP</button>
 
-        <div class="control-scores">
-          <div class="control-score">
-            <label for="inputDesign">🎨 Design</label>
-            <input type="number" id="inputDesign" min="0" max="10" step="0.1" value="8" />
-          </div>
-          <div class="control-score">
-            <label for="inputUsefulness">🚀 Usefulness</label>
-            <input type="number" id="inputUsefulness" min="0" max="10" step="0.1" value="8" />
-          </div>
-          <div class="control-score">
-            <label for="inputWow">🤯 Wow Factor</label>
-            <input type="number" id="inputWow" min="0" max="10" step="0.1" value="8" />
-          </div>
-          <div class="control-score">
-            <label for="inputFreeValue">💸 Free Value</label>
-            <input type="number" id="inputFreeValue" min="0" max="10" step="0.1" value="8" />
-          </div>
-          <div class="control-score">
-            <label for="inputReturn">🎯 Return Value</label>
-            <input type="number" id="inputReturn" min="0" max="10" step="0.1" value="8" />
-          </div>
-        </div>
+        <div class="queue-list" id="queueList"></div>
+        <p class="queue-empty" id="queueEmpty">No sites in the lineup yet — add a few above, then start the show.</p>
 
-        <button class="btn-stage" id="revealPerformerBtn">🎬 REVEAL PERFORMER</button>
-        <p class="control-card__hint">Tip: this backstage screen is just for you — cut it out in editing, or keep the window small while you fill it in before going full screen.</p>
+        <button class="btn-stage" id="startShowBtn">🎤 START SHOW</button>
+        <p class="control-card__hint">Add as many sites as you want now, off camera. You'll enter each site's scores live, one at a time, once the show starts — you can also come back here mid-show to queue up more.</p>
       </div>
     </section>
 
@@ -85,6 +75,30 @@
       <h2 class="performer-name" id="performerName">Website Name</h2>
       <p class="performer-tagline" id="performerTagline">Tagline goes here</p>
       <button class="btn-stage" id="scoreItBtn">🎭 SCORE IT</button>
+    </section>
+
+    <section class="scene" data-scene="scoreEntry">
+      <p class="kicker">SCORING LIVE</p>
+      <h2 class="score-entry-name" id="scoreEntryName">Website Name</h2>
+      <div class="control-scores control-scores--live">
+        <div class="control-score">
+          <label for="inputFirstImpression">👀 First Impression</label>
+          <input type="number" id="inputFirstImpression" min="0" max="10" step="0.1" value="5" />
+        </div>
+        <div class="control-score">
+          <label for="inputWow">🤯 Wow Factor</label>
+          <input type="number" id="inputWow" min="0" max="10" step="0.1" value="5" />
+        </div>
+        <div class="control-score">
+          <label for="inputUsefulness">🚀 Usefulness</label>
+          <input type="number" id="inputUsefulness" min="0" max="10" step="0.1" value="5" />
+        </div>
+        <div class="control-score">
+          <label for="inputReturn">🎯 Return Value</label>
+          <input type="number" id="inputReturn" min="0" max="10" step="0.1" value="5" />
+        </div>
+      </div>
+      <button class="btn-stage" id="revealScorecardBtn">🏆 REVEAL SCORECARD</button>
     </section>
 
     <section class="scene" data-scene="scorecard">
@@ -102,6 +116,15 @@
       <div class="verdict-actions" id="verdictActions" hidden>
         <button class="btn-stage" id="nextWebsiteBtn">➡️ NEXT WEBSITE</button>
         <button class="btn-stage btn-stage--ghost" id="endShowBtn">🏠 END SHOW</button>
+      </div>
+    </section>
+
+    <section class="scene" data-scene="wrap">
+      <p class="kicker">THAT'S A WRAP</p>
+      <h2 class="wrap-title">🎬 Every site in the lineup has been judged.</h2>
+      <div class="verdict-actions">
+        <button class="btn-stage" id="addMoreBtn">➕ ADD MORE SITES</button>
+        <button class="btn-stage btn-stage--ghost" id="wrapHomeBtn">🏠 END SHOW</button>
       </div>
     </section>
 

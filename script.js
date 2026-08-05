@@ -2,14 +2,13 @@
   'use strict';
 
   const CRITERIA = [
-    { key: 'design', label: '🎨 Design', input: 'inputDesign' },
-    { key: 'usefulness', label: '🚀 Usefulness', input: 'inputUsefulness' },
+    { key: 'firstImpression', label: '👀 First Impression', input: 'inputFirstImpression' },
     { key: 'wow', label: '🤯 Wow Factor', input: 'inputWow' },
-    { key: 'freeValue', label: '💸 Free Value', input: 'inputFreeValue' },
+    { key: 'usefulness', label: '🚀 Usefulness', input: 'inputUsefulness' },
     { key: 'returnValue', label: '🎯 Return Value', input: 'inputReturn' },
   ];
 
-  const EPISODE_KEY = 'igl_site_count_v1';
+  const STATE_KEY = 'igl_show_state_v2';
 
   const scenes = {};
   document.querySelectorAll('.scene').forEach(el => { scenes[el.dataset.scene] = el; });
@@ -18,19 +17,27 @@
   const homeBtn = document.getElementById('homeBtn');
   const flashOverlay = document.getElementById('flashOverlay');
 
-  let siteCount = Number(localStorage.getItem(EPISODE_KEY)) || 0;
-  let currentEntry = null;
   let activeScene = 'intro';
 
-  function updateEpisodeTag() {
-    if (siteCount > 0) {
-      episodeTag.textContent = 'SITE #' + String(siteCount).padStart(3, '0');
-      episodeTag.hidden = false;
-    } else {
-      episodeTag.hidden = true;
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STATE_KEY);
+      if (!raw) return { queue: [], currentIndex: 0 };
+      const parsed = JSON.parse(raw);
+      return {
+        queue: Array.isArray(parsed.queue) ? parsed.queue : [],
+        currentIndex: Number.isInteger(parsed.currentIndex) ? parsed.currentIndex : 0,
+      };
+    } catch (e) {
+      return { queue: [], currentIndex: 0 };
     }
   }
-  updateEpisodeTag();
+
+  let state = loadState();
+
+  function saveState() {
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  }
 
   function goToScene(name) {
     if (!scenes[name]) return;
@@ -39,46 +46,123 @@
     activeScene = name;
   }
 
-  document.querySelectorAll('[data-goto]').forEach(btn => {
-    btn.addEventListener('click', () => goToScene(btn.dataset.goto));
-  });
+  function updateEpisodeTag() {
+    if (state.queue.length > 0 && state.currentIndex < state.queue.length) {
+      episodeTag.textContent = 'SITE ' + (state.currentIndex + 1) + ' OF ' + state.queue.length;
+      episodeTag.hidden = false;
+    } else {
+      episodeTag.hidden = true;
+    }
+  }
 
   homeBtn.addEventListener('click', () => goToScene('intro'));
 
-  // ---------- Setup -> Performer ----------
-  const revealPerformerBtn = document.getElementById('revealPerformerBtn');
-  revealPerformerBtn.addEventListener('click', () => {
-    const name = document.getElementById('inputName').value.trim();
-    if (!name) {
-      document.getElementById('inputName').focus();
-      return;
-    }
-    const tagline = document.getElementById('inputTagline').value.trim();
-    const scores = {};
-    CRITERIA.forEach(c => {
-      const raw = Number(document.getElementById(c.input).value);
-      scores[c.key] = Number.isFinite(raw) ? Math.max(0, Math.min(10, raw)) : 0;
+  // ---------- Intro -> Queue ----------
+  document.getElementById('buildLineupBtn').addEventListener('click', () => {
+    renderQueueList();
+    goToScene('queue');
+  });
+
+  // ---------- Queue management ----------
+  const queueNameInput = document.getElementById('queueName');
+  const queueTaglineInput = document.getElementById('queueTagline');
+  const queueListEl = document.getElementById('queueList');
+  const queueEmptyEl = document.getElementById('queueEmpty');
+  const startShowBtn = document.getElementById('startShowBtn');
+
+  function renderQueueList() {
+    queueListEl.innerHTML = '';
+    queueEmptyEl.style.display = state.queue.length === 0 ? '' : 'none';
+
+    state.queue.forEach((item, i) => {
+      const row = document.createElement('div');
+      row.className = 'queue-item';
+      if (i < state.currentIndex) row.classList.add('is-done');
+      if (i === state.currentIndex) row.classList.add('is-current');
+      row.innerHTML = `
+        <span class="queue-item__index">${i + 1}.</span>
+        <span class="queue-item__text">
+          <span class="queue-item__name"></span>
+          <span class="queue-item__tagline"></span>
+        </span>
+        <button class="queue-item__remove" type="button" title="Remove">✕</button>
+      `;
+      row.querySelector('.queue-item__name').textContent = item.name;
+      row.querySelector('.queue-item__tagline').textContent = item.tagline || '';
+      row.querySelector('.queue-item__remove').addEventListener('click', () => removeQueueItem(item.id));
+      queueListEl.appendChild(row);
     });
 
-    currentEntry = { name, tagline, scores };
-    siteCount += 1;
-    localStorage.setItem(EPISODE_KEY, String(siteCount));
+    startShowBtn.textContent = state.currentIndex > 0 && state.currentIndex < state.queue.length
+      ? '▶ RESUME SHOW'
+      : '🎤 START SHOW';
+    startShowBtn.disabled = state.queue.length === 0 || state.currentIndex >= state.queue.length;
+    startShowBtn.style.opacity = startShowBtn.disabled ? '0.4' : '1';
+    startShowBtn.style.cursor = startShowBtn.disabled ? 'not-allowed' : 'pointer';
+
     updateEpisodeTag();
+  }
 
-    document.getElementById('performerName').textContent = currentEntry.name;
-    document.getElementById('performerTagline').textContent = currentEntry.tagline || '';
-    document.getElementById('performerTagline').style.display = currentEntry.tagline ? '' : 'none';
+  document.getElementById('addToQueueBtn').addEventListener('click', () => {
+    const name = queueNameInput.value.trim();
+    if (!name) {
+      queueNameInput.focus();
+      return;
+    }
+    const tagline = queueTaglineInput.value.trim();
+    state.queue.push({ id: 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8), name, tagline });
+    saveState();
+    queueNameInput.value = '';
+    queueTaglineInput.value = '';
+    queueNameInput.focus();
+    renderQueueList();
+  });
 
+  function removeQueueItem(id) {
+    const idx = state.queue.findIndex(item => item.id === id);
+    if (idx === -1) return;
+    state.queue.splice(idx, 1);
+    if (idx < state.currentIndex) state.currentIndex -= 1;
+    saveState();
+    renderQueueList();
+  }
+
+  startShowBtn.addEventListener('click', () => {
+    if (state.currentIndex >= state.queue.length) return;
+    loadPerformer(state.currentIndex);
     goToScene('performer');
   });
 
-  // ---------- Performer -> Scorecard ----------
-  const scoreItBtn = document.getElementById('scoreItBtn');
+  // ---------- Performer reveal ----------
+  function loadPerformer(index) {
+    const item = state.queue[index];
+    if (!item) return;
+    document.getElementById('performerName').textContent = item.name;
+    const taglineEl = document.getElementById('performerTagline');
+    taglineEl.textContent = item.tagline || '';
+    taglineEl.style.display = item.tagline ? '' : 'none';
+    document.getElementById('scoreEntryName').textContent = item.name;
+    updateEpisodeTag();
+  }
+
+  document.getElementById('scoreItBtn').addEventListener('click', () => {
+    CRITERIA.forEach(c => { document.getElementById(c.input).value = 5; });
+    goToScene('scoreEntry');
+  });
+
+  // ---------- Score entry -> Scorecard ----------
   const scorecardRows = document.getElementById('scorecardRows');
   const finalVerdictBtn = document.getElementById('finalVerdictBtn');
+  let currentScores = null;
 
-  scoreItBtn.addEventListener('click', () => {
-    document.getElementById('scorecardName').textContent = currentEntry.name;
+  document.getElementById('revealScorecardBtn').addEventListener('click', () => {
+    currentScores = {};
+    CRITERIA.forEach(c => {
+      const raw = Number(document.getElementById(c.input).value);
+      currentScores[c.key] = Number.isFinite(raw) ? Math.max(0, Math.min(10, raw)) : 0;
+    });
+
+    document.getElementById('scorecardName').textContent = state.queue[state.currentIndex].name;
     scorecardRows.innerHTML = '';
     finalVerdictBtn.hidden = true;
 
@@ -90,7 +174,7 @@
         <span class="row-track"><span class="row-fill"></span></span>
         <span class="row-value">0.0</span>
       `;
-      row.dataset.target = currentEntry.scores[c.key];
+      row.dataset.target = currentScores[c.key];
       scorecardRows.appendChild(row);
     });
 
@@ -153,7 +237,7 @@
   }
 
   finalVerdictBtn.addEventListener('click', () => {
-    const values = CRITERIA.map(c => currentEntry.scores[c.key]);
+    const values = CRITERIA.map(c => currentScores[c.key]);
     const avg = Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10;
 
     finalScoreEl.textContent = '0.0';
@@ -189,14 +273,26 @@
 
   // ---------- Verdict actions ----------
   document.getElementById('nextWebsiteBtn').addEventListener('click', () => {
-    document.getElementById('inputName').value = '';
-    document.getElementById('inputTagline').value = '';
-    CRITERIA.forEach(c => { document.getElementById(c.input).value = 8; });
-    goToScene('setup');
-    document.getElementById('inputName').focus();
+    state.currentIndex += 1;
+    saveState();
+    updateEpisodeTag();
+
+    if (state.currentIndex < state.queue.length) {
+      loadPerformer(state.currentIndex);
+      goToScene('performer');
+    } else {
+      goToScene('wrap');
+    }
   });
 
   document.getElementById('endShowBtn').addEventListener('click', () => goToScene('intro'));
+
+  // ---------- Wrap actions ----------
+  document.getElementById('addMoreBtn').addEventListener('click', () => {
+    renderQueueList();
+    goToScene('queue');
+  });
+  document.getElementById('wrapHomeBtn').addEventListener('click', () => goToScene('intro'));
 
   // ---------- Keyboard shortcuts ----------
   document.addEventListener('keydown', (e) => {
@@ -208,13 +304,17 @@
       return;
     }
 
-    if (isTyping) return;
+    if (isTyping && e.key !== 'Enter') return;
+    if (isTyping && activeScene === 'queue') return;
 
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
       const buttons = scenes[activeScene].querySelectorAll('.btn-stage');
-      const primaryBtn = Array.from(buttons).find(b => b.offsetParent !== null);
+      const primaryBtn = Array.from(buttons).find(b => b.offsetParent !== null && !b.disabled);
       if (primaryBtn) primaryBtn.click();
     }
   });
+
+  // ---------- Init ----------
+  updateEpisodeTag();
 })();
