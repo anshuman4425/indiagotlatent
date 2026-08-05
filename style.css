@@ -279,26 +279,39 @@ html, body {
   max-width: 90vw;
 }
 /* ---------- Logo (intro) ---------- */
-.logo { display: flex; flex-direction: column; align-items: center; line-height: 0.95; margin-bottom: 20px; }
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.95;
+  margin-bottom: 18px;
+}
 .logo__line1 {
   font-family: 'Playfair Display', serif;
   font-weight: 700;
-  font-size: clamp(1.4rem, 3.2vw, 2.4rem);
+  font-size: clamp(1.3rem, 2.8vw, 2rem);
   color: var(--gold-pale);
-  letter-spacing: 0.14em;
-  margin-bottom: 4px;
+  letter-spacing: 0.22em;
+  margin-bottom: -2px;
   text-shadow: 0 3px 10px rgba(0,0,0,0.9), 0 0 18px rgba(0,0,0,0.7);
 }
 .logo__line2 {
   font-family: 'Playfair Display', serif;
   font-weight: 900;
-  font-size: clamp(4rem, 11.5vw, 9rem);
-  letter-spacing: 0.02em;
+  font-size: clamp(3rem, 7.5vw, 5.8rem);
+  letter-spacing: 0.05em;
   background: linear-gradient(180deg, var(--gold-pale) 0%, var(--gold) 45%, var(--gold-deep) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   animation: neonFlicker 2.6s ease-in-out infinite;
+}
+.logo__rule {
+  width: min(220px, 40vw);
+  height: 2px;
+  margin-top: 16px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.75;
 }
 @keyframes neonFlicker {
   0%, 100% {
