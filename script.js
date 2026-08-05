@@ -55,7 +55,7 @@
     }
   }
 
-  homeBtn.addEventListener('click', () => { refreshIntroButton(); goToScene('intro'); });
+  homeBtn.addEventListener('click', () => { renderQueueList(); goToScene('queue'); });
 
   // ---------- Intro (dynamic action button) ----------
   // This screen is what ends up on camera, so it never mentions the
